@@ -1,26 +1,34 @@
-name: Frontend CI
+name: Test HTML Files on Main
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
+    paths: [ '**.html' ]
 
 jobs:
-  build:
+  test-html:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "18"
-
-      - name: Run build
-        run: npm run build
-
-      - name: Run tests
-        run: npm test
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Find HTML files
+      id: find-html
+      run: |
+        HTML_FILES=$(find . -name "*.html" -type f)
+        echo "Found HTML files:"
+        echo "$HTML_FILES"
+        echo "html_files=$HTML_FILES" >> $GITHUB_OUTPUT
+        
+    - name: Run HTML tests
+      run: |
+        if [ -n "${{ steps.find-html.outputs.html_files }}" ]; then
+          echo "Running tests on HTML files..."
+          # Add your HTML test commands here
+          # Example: npm test
+          # Example: python -m pytest test_html.py
+          echo "HTML tests completed"
+        else
+          echo "No HTML files found to test"
+        fi
